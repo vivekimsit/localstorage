@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Localstorage</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <div class="main">
+      <h2>LOCAL TAPAS</h2>
+      <ul class="plates">
+        <li>Loading...</li>
+      </ul>
+      <form class="add-items">
+        <input type="text" name="item" placeholder="Item Name" required>
+        <input type="submit" value="+ Add Item">
+      </form>
+    </div>
+    <script>
+      addItems = document.querySelector('.add-items');
+      itemList = document.querySelector('.plates');
+      addItems.addEventListener('submit', addItem);
+      itemList.addEventListener('click', toggleDone);
+      const items = JSON.parse(localStorage.getItem('items')) || [];
+
+      function addItem(e) {
+        e.preventDefault();
+        const text = this.querySelector('[name=item]').value;
+        items.push({
+          text,
+          done: false,
+        });
+        populateList(items, itemList);
+        localStorage.setItem('items', JSON.stringify(items));
+        this.reset();
+      }
+
+      function populateList(plates=[], platesList) {
+        platesList.innerHTML = plates.map((plate, i) => {
+          return `
+            <li>
+              <input type="checkbox" data-index=${i} id="item${i}" />
+              <lable for="item${i}">${plate.text}</lable>
+            </li>
+          `;
+        }).join('');
+      }
+
+      function toggleDone(e) {
+        if (!e.target.matches('input')) return;
+        const el = e.target;
+        const index = el.dataset.index;
+        items[index].done = !items[index].done;
+        localStorage.setItem('items', JSON.stringify(items));
+        populateList(items, itemList);
+      }
+
+      populateList(items, itemList);
+    </script>
+  </body>
+</html>
